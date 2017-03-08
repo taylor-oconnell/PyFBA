@@ -3,7 +3,7 @@ import sys
 from PyFBA import lp
 import PyFBA
 
-def run_fba(compounds, reactions, reactions_to_run, media, biomass_equation, uptake_secretion={}, verbose=False):
+def run_fba(compounds, reactions, reactions_to_run, media, biomass_equation, uptake_secretion={}, verbose=False, likelihood_gapfill=False):
     """
     Run an fba for a set of data. We required the reactions object,
     a list of reactions to run, the media, and the biomass_equation equation.
@@ -22,14 +22,19 @@ def run_fba(compounds, reactions, reactions_to_run, media, biomass_equation, upt
     :type media: set
     :param biomass_equation: The biomass_equation equation
     :type biomass_equation: network.reaction.Reaction
+    :param likelihood_gapfill: Run in likelihood-based gapfilling mode
+    :type likelihood_gapfill: bool
     :param verbose: Print more output
     :type verbose: bool
     :return: which type of linear resolution, the output value of the model, whether the model grew
     :rtype: (str, float, bool)
 
     """
-
-    cp, rc, reactions = PyFBA.fba.create_stoichiometric_matrix(reactions_to_run, reactions, compounds, media, biomass_equation,
+    if likelihood_gapfill:
+        cp, rc, reactions = PyFBA.fba.create_stoichiometric_matrix(reactions_to_run, reactions, compounds, media, biomass_equation,
+                                                     uptake_secretion, verbose=False, likelihood_gapfill=True)
+    else:
+        cp, rc, reactions = PyFBA.fba.create_stoichiometric_matrix(reactions_to_run, reactions, compounds, media, biomass_equation,
                                                      uptake_secretion, verbose=False)
 
     rbvals = PyFBA.fba.reaction_bounds(reactions, rc, media)
