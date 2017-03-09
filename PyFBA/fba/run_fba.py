@@ -57,8 +57,11 @@ def run_fba(compounds, reactions, reactions_to_run, media, biomass_equation, upt
         sys.stderr.write("Number of total compounds: {}\n".format(len(compounds)))
         sys.stderr.write("SMat dimensions: {} x {}\n".format(len(cp), len(rc)))
 
-    status, value = PyFBA.lp.solve()
-    
+    if likelihood_gapfill:
+        status, value = PyFBA.lp.solve(likelihood_gapfill=True)
+    else:
+        status, value = PyFBA.lp.solve()
+
     growth = False
     if value > 1:
         growth = True
