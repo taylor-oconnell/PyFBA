@@ -4,7 +4,8 @@ from PyFBA import lp
 
 
 def create_stoichiometric_matrix(reactions_to_run, reactions, compounds, media, biomass_equation,
-                                 uptake_secretion=None, verbose=False):
+                                 uptake_secretion=None, verbose=False, likelihood_gapfill=False,
+                                 reaction_probs=None, original_reactions_to_run=None):
     """Given the reactions data and a list of RIDs to include, build a
     stoichiometric matrix and load that into the linear solver.
 
@@ -26,6 +27,12 @@ def create_stoichiometric_matrix(reactions_to_run, reactions, compounds, media, 
     :type media: set
     :param biomass_equation: the biomass_equation equation as a Reaction object
     :type biomass_equation: metabolism.Reaction
+    :param likelihood_gapfill: Run in likelihood-based gapfilling mode
+    :type likelihood_gapfill: bool
+    :param reaction_probs: An optional hash of reaction ids and their associated probabilities
+    :type reaction_probs: dict of reactions (keys) and their associated probabilities as float (values)
+    :param original_reactions_to_run: An optional set of the reaction ids that were in the original draft model before gap filling. (For use in likelihood-based gapfilling)
+    :type original_reactions_to_run: set
     :param verbose: print more information
     :type verbose: bool
     :returns: Sorted lists of all the compounds and reactions in the model, and a revised reactions dict that includes the uptake and secretion reactions
@@ -120,10 +127,30 @@ def create_stoichiometric_matrix(reactions_to_run, reactions, compounds, media, 
     # load the data into the model
     PyFBA.lp.load(data, cp, rc)
 
-    # now set the objective function.It is the biomass_equation
-    # equation which is the last reaction in the network
-    ob = [0.0 for r in rc]
-    ob[-1] = 1
+    # Now set the objective function.
+    # In likelihood-based gapfill mode, the objective coefficients are penalty values for adding
+    # the reaction to the model.  These are either equal to 0.0 for reactions already in the un-gapfilled
+    # model, or are based off of the reaction probabilities.  Reactions proposed for addition that do
+    # not have associated probabilities get the maximum penalty of 1.0.
+    if likelihood_gapfill:
+        ob = []
+        for r in rc:
+            if r in original_reactions_to_run:
+                # no penalty for the reaction if it was in the original un-gapfilled model
+                ob.append(0.0)
+            elif r in reaction_probs:
+                # penalty to add the reaction based upon reaction probability
+                ob.append(1.0 - reaction_probs[r])
+            else:
+                # max penalty of 1 given to reactions with no associated probability for the reaction
+                ob.append(1.0)
+        # no penalty for the biomass reaction
+        ob[-1] = 0.0
+    else:
+        # For normal FBA, objective function is equal to the biomass_equation,
+        # which is the last reaction in the network.
+        ob = [0.0 for r in rc]
+        ob[-1] = 1
 
     PyFBA.lp.objective_coefficients(ob)
 
