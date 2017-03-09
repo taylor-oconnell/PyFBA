@@ -125,7 +125,10 @@ def create_stoichiometric_matrix(reactions_to_run, reactions, compounds, media, 
                 data[i].append(0.0)
 
     # load the data into the model
-    PyFBA.lp.load(data, cp, rc)
+    if likelihood_gapfill:
+        PyFBA.lp.load(data, cp, rc, likelihood_gapfill=True)
+    else:
+        PyFBA.lp.load(data, cp, rc)
 
     # Now set the objective function.
     # In likelihood-based gapfill mode, the objective coefficients are penalty values for adding
