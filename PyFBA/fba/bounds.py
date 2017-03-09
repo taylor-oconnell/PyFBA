@@ -3,7 +3,8 @@ import sys
 from PyFBA import lp
 
 
-def reaction_bounds(reactions, reactions_to_run, media, lower=-1000.0, mid=0.0, upper=1000.0, verbose=False):
+def reaction_bounds(reactions, reactions_to_run, media, lower=-1000.0, mid=0.0, upper=1000.0, verbose=False,
+                    likelihood_gapfill=False):
     """
     Set the bounds for each reaction. We set the reactions to run between
     either lower/mid, mid/upper, or lower/upper depending on whether the
@@ -21,6 +22,8 @@ def reaction_bounds(reactions, reactions_to_run, media, lower=-1000.0, mid=0.0, 
     :type mid: float
     :param upper: The default upper bound
     :type upper: float
+    :param likelihood_gapfill: Run in likelihood-based gapfilling mode
+    :type likelihood_gapfill: bool
     :return: A dict of the reaction ID and the tuple of bounds
     :rtype: dict
 
@@ -37,7 +40,10 @@ def reaction_bounds(reactions, reactions_to_run, media, lower=-1000.0, mid=0.0, 
         if r in reactions:
             direction = reactions[r].direction
         elif r == 'BIOMASS_EQN':
-            direction = '>'
+            if likelihood_gapfill:
+                rbvals[r] = (0.001, upper)
+            else:
+                direction = '>'
         else:
             sys.stderr.write("Did not find {} in reactions\n".format(r))
             direction = "="
