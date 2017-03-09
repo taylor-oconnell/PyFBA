@@ -20,7 +20,7 @@ That means this code is limited to python2.7.
 solver = glpk.LPX()
 
 
-def load(matrix, rowheaders=None, colheaders=None, verbose=0):
+def load(matrix, rowheaders=None, colheaders=None, verbose=0, likelihood_gapfill=False):
     """
     Load the data matrix into the linear programming solver
 
@@ -33,6 +33,8 @@ def load(matrix, rowheaders=None, colheaders=None, verbose=0):
     :type colheaders: list
     :param verbose: verbose turns on some debugging output. The higher the number the more output is generated
     :type verbose: int
+    :param likelihood_gapfill: Run in likelihood-based gapfill mode
+    :type likelihood_gapfill: bool
     :return: void
     :rtype: void
 
@@ -40,8 +42,11 @@ def load(matrix, rowheaders=None, colheaders=None, verbose=0):
     global solver
 
     solver.erase()
-
-    solver.obj.maximize = True
+    
+    if likelihood_gapfill:
+        solver.obj.maximize = False
+    else:
+        solver.obj.maximize = True
 
     nrows = len(matrix)
     ncols = len(matrix[0])
