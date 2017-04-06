@@ -30,7 +30,7 @@ def role_probs_to_reaction_probs(role_probs, verbose=False):
             if cmplx not in cmplx_probs:
                 cmplx_probs[cmplx] = [role_probs[role]]
             else:
-                cmplx_probs.append(role_probs[role])
+                cmplx_probs[cmplx].append(role_probs[role])
 
     # Write out enzyme complexes and probabilites to file
     fout = open('genome_enzyme_complex_probabilities.txt','w')
@@ -49,8 +49,14 @@ def role_probs_to_reaction_probs(role_probs, verbose=False):
                 rxn_probs[rxn] = [cmplx_probs[cmplx]]
             else:
                 rxn_probs[rxn].append(cmplx_probs[cmplx])
+
+    # Write out
+    fout = open('genome_reaction_probabilities.txt','w')
+    fout.write('REACTION\tPROBABILITY\n')
     for rxn in rxn_probs:
         rxn_probs[rxn] = max(rxn_probs[rxn])
+        fout.write(rxn + '\t' + str(rxn_probs[rxn]) + '\n')
+    fout.close()
 
     return rxn_probs
         
