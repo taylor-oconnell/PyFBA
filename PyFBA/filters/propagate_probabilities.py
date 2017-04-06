@@ -37,7 +37,7 @@ def role_probs_to_reaction_probs(role_probs, verbose=False):
     fout.write('ENZYME COMPLEX\tPROBABILITY\n')
     for cmplx in cmplx_probs:
         cmplx_probs[cmplx] = min(cmplx_probs[cmplx])
-        fout.write(cmplx + '\t' + str(cmplx_probs[cmplx]))
+        fout.write(cmplx + '\t' + str(cmplx_probs[cmplx]) + '\n')
     fout.close()
         
 
