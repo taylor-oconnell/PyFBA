@@ -31,8 +31,15 @@ def role_probs_to_reaction_probs(role_probs, verbose=False):
                 cmplx_probs[cmplx] = [role_probs[role]]
             else:
                 cmplx_probs.append(role_probs[role])
+
+    # Write out enzyme complexes and probabilites to file
+    fout = open('genome_enzyme_complex_probabilities.txt','w')
+    fout.write('ENZYME COMPLEX\tPROBABILITY\n')
     for cmplx in cmplx_probs:
         cmplx_probs[cmplx] = min(cmplx_probs[cmplx])
+        fout.write(cmplx + '\t' + str(cmplx_probs[cmplx]))
+    fout.close()
+        
 
     # Map enzyme complex probabilities to reaction probabilities
     rxn_probs = {}
