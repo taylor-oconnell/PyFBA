@@ -44,6 +44,12 @@ def role_probs_to_reaction_probs(role_probs, verbose=False):
     # Map enzyme complex probabilities to reaction probabilities
     rxn_probs = {}
     for cmplx in cmplx_probs:
+        if cmplx not in cmplx_2_rxn:
+            if verbose:
+                # This can occur because there are some complexes that don't
+                # have an associated reaction
+                sys.stderr.write("ERROR: " + cmplx + " was not found in the complexes file.")
+            continue
         for rxn in cmplx_2_rxn[cmplx]:
             if rxn not in rxn_probs:
                 rxn_probs[rxn] = [cmplx_probs[cmplx]]
