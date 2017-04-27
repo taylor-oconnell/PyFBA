@@ -41,7 +41,7 @@ def reaction_bounds(reactions, reactions_to_run, media, lower=-1000.0, mid=0.0, 
             direction = reactions[r].direction
         elif r == 'BIOMASS_EQN':
             if likelihood_gapfill:
-                rbvals[r] = (0.001, upper)
+                rbvals[r] = (1.0, upper)
             else:
                 direction = '>'
         else:
@@ -81,8 +81,8 @@ def reaction_bounds(reactions, reactions_to_run, media, lower=-1000.0, mid=0.0, 
             # rbvals[r] =  (lower, upper)
         elif direction == "<":
             # This is what I think it should be:
-            # rbvals[r] = (lower, mid)
-            rbvals[r] = (lower, upper)
+            rbvals[r] = (lower, mid)
+            #rbvals[r] = (lower, upper)
         else:
             sys.stderr.write("DO NOT UNDERSTAND DIRECTION " + direction + " for " + r + "\n")
             rbvals[r] = (mid, upper)
