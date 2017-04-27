@@ -559,5 +559,83 @@ class Reaction:
         (self.pLR, self.pRL) = (self.pRL, self.pLR)
         self.deltaG = -self.deltaG
 
+    def split_reaction(self):
+        """
+        Split a bidirectional reaction into two reactions:
+        (1) a forward reaction and (2) a reverse reaction
+
+        :return: Forward reaction and reverse reaction for the input bidirectional reaction               
+        :rtype: Reaction object, Reaction object
+        """
+        
+        # Create new reaction object for the forward reaction
+        rxn_f = PyFBA.metabolism.Reaction(self.name + "_f")
+
+        # Set the object attributes of the forward reaction to those of
+        # the input bidirectional reaction, but change the directionality
+        # to forward (>)
+        rxn_f.description = self.description
+        rxn_f.equation = self.equation
+        rxn_f.direction = '>'
+        (rxn_f.left_compounds, rxn_f.right_compounds) = (self.left_compounds, self.right_compounds)
+        (rxn_f.left_abundance, rxn_f.right_abundance) = (self.left_abundance, self.right_abundance)
+        if self.lower_bound:
+            rxn_f.lower_bound = 0.0
+        if self.upper_bound:
+            rxn_f.upper_bound = 1000.0
+        (rxn_f.pLR, rxn_f.pRL) = (self.pLR, self.pRL)
+        rxn_f.enzymes = self.enzymes
+        rxn_f.pegs = self.pegs
+        rxn_f.deltaG = self.deltaG
+        rxn_f.deltaG_error = self.deltaG_error
+        rxn_f.inp = self.inp
+        rxn_f.outp = self.outp
+        rxn_f.is_transport = self.is_transport
+        rxn_f.ran = self.ran
+        rxn_f.is_biomass_reaction = self.is_biomass_reaction
+        rxn_f.biomass_direction = self.biomass_direction
+        rxn_f.is_gapfilled = self.is_gapfilled
+        rxn_f.gapfill_method = self.gapfill_method
+        rxn_f.is_uptake_secretion = self.is_uptake_secretion
+
+        # Create new reaction object for the reverse reaction
+        rxn_r = PyFBA.metabolism.Reaction(self.name + "_r")
+
+        # Set the object attributes of the reverse reaction to those of
+        # the input bidirectional reaction, but change directionality to
+        # backward (<) and reverse the reaction i.e., swap the compounds
+        # and abundances on the left and right to other side, negate the
+        # deltaG, and swap the pLR and PRL
+        rxn_r.description = self.description
+        rxn_r.equation = self.equation
+        rxn_r.direction = '<'
+        (rxn_r.left_compounds, rxn_r.right_compounds) = (self.right_compounds, self.left_compounds)
+        (rxn_r.left_abundance, rxn_r.right_abundance) = (self.right_abundance, self.left_abundance)
+        if self.lower_bound:
+            rxn_r.lower_bound = -1000.0
+        if self.upper_bound:
+            rxn_r.upper_bound = 0.0
+        (rxn_r.pLR, rxn_r.pRL) = (self.pRL, self.pLR)
+        rxn_r.enzymes = self.enzymes
+        rxn_r.pegs = self.pegs
+        rxn_r.deltaG = -self.deltaG
+        rxn_r.deltaG_error = self.deltaG_error
+        rxn_r.inp = self.inp
+        rxn_r.outp = self.outp
+        rxn_r.is_transport = self.is_transport
+        rxn_r.ran = self.ran
+        rxn_r.is_biomass_reaction = self.is_biomass_reaction
+        rxn_r.biomass_direction = self.biomass_direction
+        rxn_r.is_gapfilled = self.is_gapfilled
+        rxn_r.gapfill_method = self.gapfill_method
+        rxn_r.is_uptake_secretion = self.is_uptake_secretion
+
+        return rxn_f, rxn_r
+        
+        
+        
+
+        
+
 
 
