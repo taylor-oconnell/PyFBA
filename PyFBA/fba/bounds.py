@@ -42,6 +42,7 @@ def reaction_bounds(reactions, reactions_to_run, media, lower=-1000.0, mid=0.0, 
         elif r == 'BIOMASS_EQN':
             if likelihood_gapfill:
                 rbvals[r] = (1.0, upper)
+                continue
             else:
                 direction = '>'
         else:
@@ -49,7 +50,7 @@ def reaction_bounds(reactions, reactions_to_run, media, lower=-1000.0, mid=0.0, 
             direction = "="
 
         # this is where we define whether our media has the components
-        if r != 'BIOMASS_EQN' and (reactions[r].is_uptake_secretion or reactions[r].is_transport):
+        if r != 'BIOMASS_EQN' and reactions[r].is_uptake_secretion:
             in_media = False
             override = False # if we have external compounds that are not in the media, we don't want to run this as a media reaction
             for c in reactions[r].left_compounds:
