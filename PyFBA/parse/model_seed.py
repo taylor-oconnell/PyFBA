@@ -190,7 +190,12 @@ def reactions(organism_type="", rctf='Biochemistry/reactions.master.tsv', verbos
                 if len(pieces) < 20:
                     sys.stderr.write("ERROR PARSING REACTION INFO: " + l)
                     continue
-
+                if pieces[18] == True or "OK" not in pieces[17]:
+                    # skip any reactions that are obsolete or any reactions that
+                    # are invalid due to mass imbalance, charge imbalance, or
+                    # invalid compound format
+                    continue
+                        
                 rid = pieces[0]
 
                 rxn = pieces[6]
