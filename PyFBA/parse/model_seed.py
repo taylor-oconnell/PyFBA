@@ -340,8 +340,9 @@ def reactions(organism_type="", rctf='Biochemistry/reactions.master.tsv', verbos
     if organism_type:
         new_rcts = template_reactions(organism_type)
         for r in new_rcts:
-            all_reactions[r].direction = new_rcts[r]['direction']
-            all_reactions[r].enzymes = new_rcts[r]['enzymes']
+            if r in all_reactions:
+                all_reactions[r].direction = new_rcts[r]['direction']
+                all_reactions[r].enzymes = new_rcts[r]['enzymes']
 
     return cpds, all_reactions
 
